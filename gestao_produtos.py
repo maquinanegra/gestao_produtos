@@ -7,6 +7,7 @@ Programa para gestão do catálogo de produtos. Este programa permite:
 """
 
 from decimal import Decimal as dec
+from hashlib import new
 import subprocess
 import sys
 from typing import TextIO
@@ -39,7 +40,7 @@ class Produto:
             raise InvalidProdAttribute(f'{id_=} inválido (deve ser > 0 e ter 5 dígitos)')
         if not nome:
             raise InvalidProdAttribute('Nome vazio')
-        if tipo not in PRODUCT_TYPES:
+        if tipo.upper() not in PRODUCT_TYPES:
             raise InvalidProdAttribute(f'Tipo de produto ({tipo}) desconhecido')
         if quantidade < 0:
             raise InvalidProdAttribute('Quantidade deve ser >= 0')
@@ -48,7 +49,7 @@ class Produto:
 
         self.id = id_
         self.nome = nome
-        self.tipo = tipo
+        self.tipo = tipo.upper()
         self.quantidade = quantidade
         self.preco = preco
     #:
@@ -59,8 +60,8 @@ class Produto:
         attrs = txt_csv.split(',')
         return cls(
             id_ = int(attrs[0]),
-            nome = attrs[1],
-            tipo = attrs[2],
+            nome = attrs[1].strip(),
+            tipo = attrs[2].strip(),
             quantidade = int(attrs[3]),
             preco = dec(attrs[4]),
         )
@@ -144,6 +145,11 @@ def le_produtos(caminho_fich_produtos: str):
             produtos.append(prod)
 #:
 
+def escreve_produtos(caminho_fich_produtos: str, new_prod):
+    with open(caminho_fich_produtos, 'wt') as fich:
+        fich.write(new_prod)
+#:
+
 def linhas_relevantes(fich: TextIO) -> list:
     for linha in fich:
         if not linha.strip():
@@ -202,12 +208,16 @@ def exec_menu():
             exec_listar()
         elif opcao in ('P', 'PESQUISAR'):
             exec_pesquisar()
-        elif opcao in ('A', 'ACRESCENTAR'):
-            exec_acrescentar()
+        elif opcao in ('A', 'ADICIONAR'):
+            exec_adicionar()
+        elif opcao in ('E', 'ELIMINAR'):
+            exibe_msg("ELIMINAR")
+        elif opcao in ('G', 'GUARDAR'):
+            exibe_msg("GUARDAR")
         elif opcao in ('T', 'TERMINAR'):
             exibe_msg("O programa vai encerrar")
-            return
-            #sys.exit(0)
+            # return
+            sys.exit(0)
         else:
             exibe_msg(f"Opção {opcao} inválida ou ainda não implementada")
         #:
@@ -228,17 +238,28 @@ def exec_pesquisar():
     pause()
 #:
 
-def exec_acrescentar():                                   
-    prodX = Produto(
-    id_ = 30987, 
-    nome = 'pão de milho',
-    tipo = 'AL',
-    quantidade = 2, 
-    preco = 1)
+def exec_adicionar():
+    def new_prod_func():
+        new_prod1 = input("Insira a referência do produto: ")
+        new_prod2 = input("Insira a descrição do produto: ") 
+        new_prod3 = input("insira o tipo de produto: ")
+        new_prod4 = input("Insira a quantidade de produto: ")
+        new_prod5 = input("Insira o preço do produto:")
+        while not new_prod1 and not new_prod2 and not new_prod3 and not new_prod4 and not new_prod5:
+            new_prod_func()
+
+        return new_prod1, new_prod2, new_prod3, new_prod4, new_prod5
     
-    print("***")
-    x = ProductCollection.append(prodX, 3)
-    exibe_msg(x)
+    new_prod1, new_prod2, new_prod3, new_prod4, new_prod5 = new_prod_func()
+    new_prod_csv = f'{new_prod1}, {new_prod2}, {new_prod3}, {new_prod4}, {new_prod5}'
+    try:
+        new_prod = Produto.from_csv(new_prod_csv)
+        produtos.append(new_prod)
+    except InvalidProdAttribute as err:
+        print (err)
+    #escreve_produtos('produtos.csv',new_prod_csv)
+    #:
+    pause()
 
 def main():
     le_produtos('produtos.csv')
