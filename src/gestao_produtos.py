@@ -11,6 +11,8 @@ Desenvolvido por:
 
 2022/07/07
 
+https://github.com/maquinanegra/gestao_produtos
+
 """
 
 from decimal import Decimal as dec
@@ -283,10 +285,12 @@ def exec_adicionar():
             pause()        
             exec_menu()
     new_prod1, new_prod2, new_prod3, new_prod4, new_prod5 = new_prod_func()
-    new_prod_csv = f'{new_prod1}, {new_prod2}, {new_prod3}, {new_prod4}, {new_prod5}'
+    ###new_prod0=Produto(int(new_prod1), new_prod2, new_prod3, float(new_prod4), dec(new_prod5))
+    new_prod0 = f'{new_prod1}, {new_prod2}, {new_prod3}, {new_prod4}, {new_prod5}'
     try:
-        new_prod = Produto.from_csv(new_prod_csv)
+        new_prod = Produto.from_csv(new_prod0)
         produtos.append(new_prod)
+        ###produtos.append(new_prod0)
         exibe_msg("Produto adicionado.")
     except InvalidProdAttribute as err:
         exibe_msg(err)
