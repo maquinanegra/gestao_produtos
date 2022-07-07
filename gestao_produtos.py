@@ -4,6 +4,13 @@ Programa para gestão do catálogo de produtos. Este programa permite:
     - Pesquisar por alguns campos 
     - Eliminar um registo do catálogo
     - Guardar o catálogo em ficheiro
+
+Desenvolvido por:
+    Tiago Vidigal
+    Rui Caria
+
+2022/07/07
+
 """
 
 from decimal import Decimal as dec
